@@ -1,7 +1,16 @@
+import { Button } from '@/components/ui/Button';
+import Link from 'next/link';
+
 export default function Home() {
   return (
-    <div>
-      <h1 className="text-3xl  text-gradient bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Home</h1>
+    <div className="container mx-auto p-4 text-center">
+      <h1 className="text-4xl font-bold">Welcome to NearVibe</h1>
+      <p className="mt-4">Discover short, local adventures tailored to you.</p>
+      <div className="mt-6">
+        <Link href="/adventures">
+          <Button>Find Adventures</Button>
+        </Link>
+      </div>
     </div>
   );
 }

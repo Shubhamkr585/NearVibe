@@ -10,28 +10,35 @@
   },
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^5.0.3",
+    "bcryptjs": "^3.0.2",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.23.0",
     "mongoose": "^8.16.1",
     "next": "15.3.5",
     "next-auth": "^4.24.11",
     "pdfkit": "^0.17.1",
-    "postcss": "^8.5.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.60.0",
     "react-konva": "^19.0.7",
-    "swr": "^2.3.4"
+    "swr": "^2.3.4",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/postcss": "^4.1.11",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/bcryptjs": "^2.4.6",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^20",
     "@types/pdfkit": "^0.14.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
+    "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11",
     "typescript": "^5"
   }
