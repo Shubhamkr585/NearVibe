@@ -1,49 +1,35 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
 
-export default function SignUp() {
-  const router = useRouter();
-  const [error, setError] = useState('');
+import { useSession } from 'next-auth/react';
+import useSWR from 'swr';
+import { Card } from '@/components/ui/Card';
+import { fetcher } from '@/lib/api/fetcher';
+import { Log } from '@/types/log';
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const response = await fetch('/api/users/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: formData.get('email'),
-        name: formData.get('name'),
-        password: formData.get('password'),
-      }),
-    });
-    if (response.ok) {
-      router.push('/auth/login');
-    } else {
-      setError('Failed to sign up');
-    }
-  };
+export default function AdventureLog() {
+  const { data: session } = useSession();
+
+  const { data: logs } = useSWR<Log[]>(
+    session ? `/api/logs?userId=${session.user.id}` : null,
+    fetcher
+  );
+
+  if (!session) {
+    return <div className="p-4">You must be signed in to view your logs.</div>;
+  }
 
   return (
-    <div className="container mx-auto p-4 flex justify-center">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label>Name</label>
-          <input name="name" type="text" className="w-full p-2 border" />
-        </div>
-        <div>
-          <label>Email</label>
-          <input name="email" type="email" className="w-full p-2 border" />
-        </div>
-        <div>
-          <label>Password</label>
-          <input name="password" type="password" className="w-full p-2 border" />
-        </div>
-        {error && <p className="text-red-500">{error}</p>}
-        <Button type="submit" variant="default">Sign Up</Button>
-      </form>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold">Your Adventure Log</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        {logs?.map((log) => (
+          <Card
+            key={log._id}
+            title={`Adventure on ${new Date(log.createdAt).toLocaleDateString()}`}
+            description={log.notes || 'No notes'}
+          />
+        ))}
+      </div>
     </div>
   );
 }

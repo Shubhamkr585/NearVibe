@@ -1,9 +1,12 @@
+// app/layout.tsx
 import './globals.css';
+import { SessionProvider } from 'next-auth/react';
 import { Inter } from 'next/font/google';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import Sidebar from '@/components/layout/Sidebar';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], preload: true });
 
 export const metadata = {
   title: 'NearVibe - Discover Local Adventures',
@@ -14,9 +17,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={inter.className}>
+        <SessionProvider>
         <Header />
-        <main className="min-h-screen">{children}</main>
+        <div className="flex min-h-screen">
+          <Sidebar />
+          <main className="flex-1 p-4">{children}</main>
+        </div>
         <Footer />
+        </SessionProvider>
       </body>
     </html>
   );

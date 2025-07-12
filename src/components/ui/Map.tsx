@@ -1,36 +1,27 @@
 'use client';
-import { useEffect, useState } from 'react';
-import Map, { Marker } from 'react-map-gl';
-import { Adventure } from '@/types/adventure';
-import { Location } from '@/lib/utils/geolocation';
+import { useEffect, useRef } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface MapProps {
-  adventures: Adventure[];
-  initialLocation: Location;
+  center: [number, number];
+  zoom?: number;
 }
 
-export function AdventureMap({ adventures, initialLocation }: MapProps) {
-  const [viewport, setViewport] = useState({
-    latitude: initialLocation.lat,
-    longitude: initialLocation.lng,
-    zoom: 12,
-  });
+export default function Map({ center, zoom = 10 }: MapProps) {
+  const mapContainer = useRef<HTMLDivElement>(null);
 
-  return (
-    <Map
-      mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-      {...viewport}
-      onMove={(evt) => setViewport(evt.viewState)}
-      style={{ width: '100%', height: 400 }}
-      mapStyle="mapbox://styles/mapbox/streets-v11"
-    >
-      {adventures.map((adventure) => (
-        <Marker
-          key={adventure._id}
-          latitude={adventure.location.coordinates[1]}
-          longitude={adventure.location.coordinates[0]}
-        />
-      ))}
-    </Map>
-  );
+  useEffect(() => {
+    mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
+    const map = new mapboxgl.Map({
+      container: mapContainer.current!,
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center,
+      zoom,
+    });
+    new mapboxgl.Marker().setLngLat(center).addTo(map);
+    return () => map.remove();
+  }, [center, zoom]);
+
+  return <div ref={mapContainer} className="w-full h-96" />;
 }
