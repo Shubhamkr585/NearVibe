@@ -4,15 +4,14 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { auth } from '@auth';
-import { signOutAction } from '@/app/actions/signout';
+import { signOut, getSession } from 'next-auth/react';
 
 export default function Header() {
   const [session, setSession] = useState<any>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    auth().then((data) => setSession(data));
+    getSession().then((data) => setSession(data));
   }, []);
 
   return (
@@ -28,13 +27,13 @@ export default function Header() {
           <Link href="/itinerary" className="hover:underline">Itinerary</Link>
           <Link href="/log" className="hover:underline">Log</Link>
           {session?.user ? (
-            <form action={signOutAction}>
-              <Button  className="text-white border-white">Sign Out</Button>
-            </form>
+            <Button className="text-white border-white" onClick={() => signOut({ callbackUrl: '/' })}>
+              Sign Out
+            </Button>
           ) : (
             <>
               <Link href="/auth/login">
-                <Button  className="text-white border-white">Sign In</Button>
+                <Button className="text-white border-white">Sign In</Button>
               </Link>
               <Link href="/auth/signup">
                 <Button className="bg-white text-blue-600 hover:bg-gray-100">Sign Up</Button>
@@ -56,13 +55,13 @@ export default function Header() {
           <Link href="/itinerary" className="block">Itinerary</Link>
           <Link href="/log" className="block">Log</Link>
           {session?.user ? (
-            <form action={signOutAction}>
-              <Button  className="text-white w-full">Sign Out</Button>
-            </form>
+            <Button className="text-white w-full" onClick={() => signOut({ callbackUrl: '/' })}>
+              Sign Out
+            </Button>
           ) : (
             <>
               <Link href="/auth/login">
-                <Button  className="text-white w-full">Sign In</Button>
+                <Button className="text-white w-full">Sign In</Button>
               </Link>
               <Link href="/auth/signup">
                 <Button className="bg-white text-blue-600 w-full">Sign Up</Button>

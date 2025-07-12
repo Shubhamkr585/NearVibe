@@ -1,34 +1,88 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import useSWR from 'swr';
-import { Card } from '@/components/ui/Card';
-import { fetcher } from '@/lib/api/fetcher';
-import { Log } from '@/types/log';
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
-export default function AdventureLog() {
-  const { data: session } = useSession();
+export default function SignUpPage() {
+  const router = useRouter();
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const { data: logs } = useSWR<Log[]>(
-    session ? `/api/logs?userId=${session.user.id}` : null,
-    fetcher
-  );
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
-  if (!session) {
-    return <div className="p-4">You must be signed in to view your logs.</div>;
-  }
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    });
+
+    const data = await res.json();
+    setLoading(false);
+
+    if (res.ok) {
+      // Optional: auto-login user after signup
+      await signIn('credentials', {
+        redirect: false,
+        email: form.email,
+        password: form.password,
+      });
+      router.push('/');
+    } else {
+      setError(data.message || 'Something went wrong.');
+    }
+  };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold">Your Adventure Log</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-        {logs?.map((log) => (
-          <Card
-            key={log._id}
-            title={`Adventure on ${new Date(log.createdAt).toLocaleDateString()}`}
-            description={log.notes || 'No notes'}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md space-y-6">
+        <h2 className="text-3xl font-bold text-center">Sign Up</h2>
+
+        {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="w-full px-4 py-2 border rounded-md"
           />
-        ))}
+          <input
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            className="w-full px-4 py-2 border rounded-md"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            className="w-full px-4 py-2 border rounded-md"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+          >
+            {loading ? 'Signing up...' : 'Sign Up'}
+          </button>
+        </form>
+
+        <div className="text-center text-sm text-gray-500">or</div>
+
+        <button
+          onClick={() => signIn('google')}
+          className="w-full border border-gray-300 text-black py-2 rounded-md hover:bg-gray-100 flex items-center justify-center gap-2"
+        >
+          <img src="/google.svg" alt="Google" className="w-5 h-5" />
+          Sign Up with Google
+        </button>
       </div>
     </div>
   );
